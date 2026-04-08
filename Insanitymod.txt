@@ -1,0 +1,492 @@
+require(game.Players.LocalPlayer.PlayerGui.MainUI.Initiator.Main_Game).caption("Made by Anzor5458",true)
+game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+wait(1)
+require(game.Players.LocalPlayer.PlayerGui.MainUI.Initiator.Main_Game).caption("Insanity mode",true)
+wait(3)
+require(game.Players.LocalPlayer.PlayerGui.MainUI.Initiator.Main_Game).caption("Thanks for Gameplays",true)
+
+-- Greed
+coroutine.wrap(function()
+    while true do
+        wait(math.random(80,120))
+        game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+        wait(2)
+-- Greed (Instant Activation)
+local function TriggerGreedNow()
+    local canExit = false
+    local isDead = false
+    
+    -- 1. EFFECTS AND SOUND (Active immediately upon startup)
+    local lighting = game:GetService("Lighting")
+    local cc = lighting:FindFirstChild("MainColorCorrection") or lighting:FindFirstChildWhichIsA("ColorCorrectionEffect")
+    
+    if not cc then
+        cc = Instance.new("ColorCorrectionEffect", lighting)
+        cc.Name = "GreedCC"
+    end
+
+    local sound = Instance.new("Sound", workspace)
+    sound.SoundId = "rbxassetid://166047422"
+    sound.Volume = 5
+    sound:Play()
+    game:GetService("Debris"):AddItem(sound, 10)
+
+    -- Flashing lights right now
+    task.spawn(function()
+        for i = 1, 3 do
+            lighting.Ambient = Color3.new(0, 0, 0)
+            task.wait(0.1)
+            lighting.Ambient = Color3.new(0.5, 0.5, 0.5)
+            task.wait(0.1)
+        end
+    end)
+
+    -- 2. TURN ON THE PINK SCREEN INSTANTLY
+    game:GetService("TweenService"):Create(cc, TweenInfo.new(1), {
+        TintColor = Color3.fromRGB(255, 191, 154),
+        Contrast = -0.19,
+        Saturation = -0.19
+    }):Play()
+
+    -- 3. DEATH LOGIC (If you open the door while the pink screen is active)
+    local connection
+    connection = game.ReplicatedStorage.GameData.LatestRoom.Changed:Connect(function()
+        if not canExit and not isDead then
+            isDead = true
+            local char = game.Players.LocalPlayer.Character
+            if char and char:FindFirstChild("Humanoid") then
+                char.Humanoid.Health = 0
+                -- Your screamer script
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/check78/Jumpscares/main/GreedJumpscare.txt"))()
+                game:GetService("ReplicatedStorage").GameStats["Player_".. game.Players.LocalPlayer.Name].Total.DeathCause.Value = "Greed"
+            end
+        end
+        if connection then connection:Disconnect() end
+    end)
+
+    -- 4. WAITING TIME (5.7 seconds)
+    task.wait(5.7)
+    canExit = true 
+
+    -- 5. BRINGING COLORS BACK
+    game:GetService("TweenService"):Create(cc, TweenInfo.new(2), {
+        TintColor = Color3.fromRGB(255, 255, 255),
+        Contrast = 0,
+        Saturation = 0
+    }):Play()
+    
+    task.wait(1)
+    if connection then connection:Disconnect() end
+    print("Greed worked instantly and completed the job.")
+end
+
+-- Launch without delay
+task.spawn(TriggerGreedNow)
+
+-- Removing Overseer at Lever
+workspace.CurrentRooms[game.ReplicatedStorage.GameData.LatestRoom.Value].Assets.ChildAdded:Connect(function(eye)
+	if eye.Name == "LeverForGate" then
+		task.wait(0.6)
+        if workspace:FindFirstChild("Overseer") then
+            workspace.Overseer:Destroy()
+        end
+	end
+end)
+    end
+end)()
+
+-- Screamer
+coroutine.wrap(function()
+    while true do
+        wait(math.random(47,67))
+        game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+        wait(2)
+local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/DOORS-Entity-Spawner-V2/main/init.luau"))()
+
+-- Creating Screamer
+local entity = Spawner:Create({
+	Entity = {
+		Name = "Screamer",
+		Asset = "rbxassetid://85319970831962", -- Твоя модель
+		HeightOffset = 0
+	},
+	Movement = {
+		Speed = 165,
+		Delay = 3,
+		Reversed = false
+	},
+	Rebounding = {
+		Enabled = true,
+		Type = "Blitz",
+		Min = 2,
+		Max = 5,
+		Delay = 0.8
+	},
+	Damage = {
+		Enabled = true,
+		Range = 45,
+		Amount = 100
+	},
+	Lights = {
+		Flicker = { Enabled = true, Duration = 2.5 },
+		Shatter = true,
+		Repair = false
+	},
+	Earthquake = { Enabled = true },
+	CameraShake = {
+		Enabled = true,
+		Range = 120,
+		Values = {2, 25, 0.15, 2}
+	},
+	Death = {
+		Type = "Curious",
+		Hints = {
+			"You died from the Screamer.",
+			"He will throw you out of the closet!",
+			"Pink light is his sign.",
+		},
+		Cause = "Screamer"
+	}
+})
+
+-- Setting up callbacks with the CORRECT keys from the library
+if entity then
+    -- OnSpawned (The key is from line 89 of your code)
+    entity:SetCallback("OnSpawned", function()
+        local model = entity.Model
+        local mainPart = model:FindFirstChild("Main") or model:FindFirstChildWhichIsA("BasePart")
+        if mainPart then
+            local light = Instance.new("PointLight")
+            light.Color = Color3.fromRGB(255, 105, 180)
+            light.Range = 25
+            light.Brightness = 8
+            light.Parent = mainPart
+        end
+    end)
+
+    -- OnEnterRoom (The key is from line 92 of your code)
+    entity:SetCallback("OnEnterRoom", function(room)
+        local player = game.Players.LocalPlayer
+        if player.Character and player.Character:GetAttribute("Hiding") == true then
+            task.wait(0.1)
+            player.Character:SetAttribute("Hiding", false) -- THROW OUT
+        end
+    end)
+
+    -- Launch
+    entity:Run(true)
+end
+    end
+end)()
+
+-- Detonation
+coroutine.wrap(function()
+    while true do
+        wait(math.random(90,344))
+        game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+        wait(2)
+
+local Overseer = Instance.new("Model")
+Overseer.Parent = workspace
+Overseer.Name = "Overseer"
+
+local v = game.Players.LocalPlayer
+local char = v.Character or v.CharacterAdded:Wait()
+local hum = char:WaitForChild("Humanoid")
+local active = true
+
+-- Setting the explosion sound (Leave a powerful bang)
+local expSound = Instance.new("Sound", workspace)
+expSound.SoundId = "rbxassetid://142070127" 
+expSound.Volume = 10
+
+-- Camera (Leave strong shaking)
+local CameraShaker = require(game.ReplicatedStorage.CameraShaker)
+local camara = game.Workspace.CurrentCamera
+local camShake = CameraShaker.new(Enum.RenderPriority.Camera.Value, function(shakeCf)
+	camara.CFrame = camara.CFrame * shakeCf
+end)
+
+local currentLoadedRoom = workspace.CurrentRooms[game:GetService("ReplicatedStorage").GameData.LatestRoom.Value]
+local eyes = game:GetObjects("rbxassetid://12285389022")[1]
+
+local num = 0
+if currentLoadedRoom:FindFirstChild("Nodes") then
+   num = math.floor(#currentLoadedRoom.Nodes:GetChildren()/2)
+end
+
+eyes.CFrame = (num == 0 and currentLoadedRoom[currentLoadedRoom.Name] or currentLoadedRoom.Nodes[num]).CFrame + Vector3.new(0, 5, 0)
+eyes.Parent = Overseer
+
+-- ADDING BEFORE THE EXPLOSION (Visual of the eyes themselves)
+if eyes:IsA("BasePart") then
+    eyes.Color = Color3.fromRGB(255, 200, 0) -- Making the eyes yellow initially
+    local glow = Instance.new("PointLight", eyes)
+    glow.Color = Color3.fromRGB(255, 215, 0) -- Yellow glow
+    glow.Range = 15
+    glow.Brightness = 3
+end
+
+game.Workspace.CurrentRooms.ChildAdded:Connect(function()
+    active = false
+    Overseer:Destroy()
+end)
+
+-- MAIN LOGIC OF EXPLOSION (On view)
+task.spawn(function()
+    while active do
+        if not eyes or not eyes.Parent then break end
+        local _, onScreen = camara:WorldToScreenPoint(eyes.Position)
+        if onScreen then
+            active = false
+            expSound:Play()
+            
+            -- 1. STRONG YELLOW FLASH (Blinding)
+            local lighting = game.Lighting
+            local flash = Instance.new("ColorCorrectionEffect", lighting)
+            flash.Brightness = 1
+            flash.Contrast = 0.5
+            flash.TintColor = Color3.fromRGB(255, 230, 150) -- Soft yellow tint of flash
+            game:GetService("TweenService"):Create(flash, TweenInfo.new(1.2), {Brightness = 0, Contrast = 0, TintColor = Color3.fromRGB(255, 255, 255)}):Play()
+            game:GetService("Debris"):AddItem(flash, 1.3)
+
+            -- 2. YELLOW EXPLOSION PARTICLES (Custom visual instead of standard)
+            local attachment = Instance.new("Attachment", workspace)
+            attachment.Position = eyes.Position
+            
+            local particles = Instance.new("ParticleEmitter", attachment)
+            particles.Color = ColorSequence.new(Color3.fromRGB(255, 255, 0), Color3.fromRGB(255, 150, 0)) -- From yellow to orange
+            particles.Size = NumberSequence.new(5, 0)
+            particles.Speed = NumberRange.new(20, 50)
+            particles.Lifetime = NumberRange.new(0.5, 1)
+            particles.Rate = 500
+            particles.SpreadAngle = Vector2.new(360, 360)
+            particles:Emit(200) -- One-time release
+            game:GetService("Debris"):AddItem(attachment, 1.1)
+
+            -- 3. SHAKE AND DAMAGE
+            camShake:Start()
+            camShake:ShakeOnce(25, 45, 0.2, 1.8) -- Increased shaking for bomb effect
+            hum:TakeDamage(85) -- Powerful one-time damage
+
+            -- Processing death
+            if hum.Health <= 0 then
+                game:GetService("ReplicatedStorage").GameStats["Player_".. v.Name].Total.DeathCause.Value = "Detonation"
+                task.wait(0.5)
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/check78/GuidingLight/main/SeerDie.txt"))()
+            end
+            
+            Overseer:Destroy() -- Destroying the model
+            break
+        end
+        task.wait(0.1)
+    end
+end)
+    end
+end)()
+
+-- Gaze 
+coroutine.wrap(function()
+    while true do
+        wait(math.random(20,30))
+        game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+        wait(2)
+
+local Overseer = Instance.new("Model")
+Overseer.Parent = workspace
+Overseer.Name = "Overseer"
+
+local v = game.Players.LocalPlayer
+local char = v.Character or v.CharacterAdded:Wait()
+local hum = char:WaitForChild("Humanoid")
+local active = true
+
+-- Sound setup (Distortion/Static sound)
+local effectSound = Instance.new("Sound", workspace)
+effectSound.SoundId = "rbxassetid://9069609200" 
+effectSound.Volume = 2
+effectSound.Pitch = 0.6
+
+-- Camera Shaker setup
+local CameraShaker = require(game.ReplicatedStorage.CameraShaker)
+local camara = game.Workspace.CurrentCamera
+local camShake = CameraShaker.new(Enum.RenderPriority.Camera.Value, function(shakeCf)
+	camara.CFrame = camara.CFrame * shakeCf
+end)
+
+local currentLoadedRoom = workspace.CurrentRooms[game:GetService("ReplicatedStorage").GameData.LatestRoom.Value]
+local eyes = game:GetObjects("rbxassetid://12285389022")[1]
+
+local num = 0
+if currentLoadedRoom:FindFirstChild("Nodes") then
+   num = math.floor(#currentLoadedRoom.Nodes:GetChildren()/2)
+end
+
+eyes.CFrame = (num == 0 and currentLoadedRoom[currentLoadedRoom.Name] or currentLoadedRoom.Nodes[num]).CFrame + Vector3.new(0, 5, 0)
+eyes.Parent = Overseer
+
+-- Initial Visuals (Grey/Desaturated look)
+if eyes:IsA("BasePart") then
+    eyes.Color = Color3.fromRGB(100, 100, 100) -- Grey eyes
+    local glow = Instance.new("PointLight", eyes)
+    glow.Color = Color3.fromRGB(200, 200, 200) 
+    glow.Range = 15
+    glow.Brightness = 2
+end
+
+-- Destroy if new room is added
+game.Workspace.CurrentRooms.ChildAdded:Connect(function()
+    active = false
+    Overseer:Destroy()
+end)
+
+-- MAIN LOGIC: Speed Decrease & Vision Blur
+task.spawn(function()
+    while active do
+        if not eyes or not eyes.Parent then break end
+        local _, onScreen = camara:WorldToScreenPoint(eyes.Position)
+        
+        -- If player looks at Overseer
+        if onScreen then
+            active = false
+            effectSound:Play()
+            
+            -- 1. Vision Impairment (Grey & Dark screen)
+            local lighting = game.Lighting
+            local cc = Instance.new("ColorCorrectionEffect", lighting)
+            cc.Saturation = -1 -- Makes screen grey
+            cc.Contrast = 0.2
+            cc.Brightness = -0.2
+            
+            -- Fade out the effect over 5 seconds
+            game:GetService("TweenService"):Create(cc, TweenInfo.new(5), {Saturation = 0, Contrast = 0, Brightness = 0}):Play()
+            game:GetService("Debris"):AddItem(cc, 5.1)
+
+            -- 2. Slow Down (Decreasing speed)
+            local originalSpeed = hum.WalkSpeed
+            hum.WalkSpeed = 4 -- Heavy slowdown
+            
+            -- Gradually restore speed
+            task.spawn(function()
+                task.wait(4)
+                if hum then
+                    game:GetService("TweenService"):Create(hum, TweenInfo.new(2), {WalkSpeed = originalSpeed}):Play()
+                end
+            end)
+
+            -- 3. Camera Shake and low damage
+            camShake:Start()
+            camShake:ShakeOnce(5, 10, 0.5, 4) 
+            hum:TakeDamage(10)
+
+            -- Death handling
+            if hum.Health <= 0 then
+                game:GetService("ReplicatedStorage").GameStats["Player_".. v.Name].Total.DeathCause.Value = "Gaze"
+                task.wait(0.5)
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/check78/GuidingLight/main/SeerDie.txt"))()
+            end
+            
+            -- Clean up Overseer
+            Overseer:Destroy()
+            break
+        end
+        task.wait(0.1)
+    end
+end)
+    end
+end)()
+
+-- Psychic
+coroutine.wrap(function()
+    while true do
+        wait(math.random(80,120))
+        game.ReplicatedStorage.GameData.LatestRoom.Changed:Wait()
+        wait(2)
+
+local Spawner = loadstring(game:HttpGet("https://raw.githubusercontent.com/RegularVynixu/DOORS-Entity-Spawner-V2/main/init.luau"))()
+
+-- 1. Create the Entity with your Custom ID
+local entity = Spawner:Create({
+    Entity = {
+        Name = "Psychic",
+        Asset = "rbxassetid://126054995168616", -- Your custom model ID
+        HeightOffset = 0
+    },
+    Movement = {
+        Speed = 65, -- Constant speed
+        Delay = 1,
+        Reversed = false
+    },
+    Damage = {
+        Enabled = true,
+        Range = 40,
+        Amount = 100
+    },
+    Lights = {
+        Flicker = { Enabled = true, Duration = 2 },
+        Shatter = true,
+        Repair = false
+    },
+    Earthquake = { Enabled = true },
+    CameraShake = {
+        Enabled = true,
+        Range = 100,
+        Values = {1.5, 20, 0.1, 1}
+    }
+})
+
+if entity then
+    local currentRoom = game.ReplicatedStorage.GameData.LatestRoom.Value
+    local isChasing = true
+
+    -- 2. STABLE INFINITE LOOP (Bypassing invalid callback error)
+    task.spawn(function()
+        while isChasing do
+            -- Start the rush
+            entity:Run(true)
+            
+            -- Wait for the entity to travel before checking for next run
+            -- Adjust wait time (4-5s) depending on how fast it clears the room
+            task.wait(4.5) 
+            
+            if not isChasing then break end
+        end
+    end)
+
+    -- 3. STOP CONDITION (Despawn when door opens)
+    local connection
+    connection = game.ReplicatedStorage.GameData.LatestRoom.Changed:Connect(function(newRoom)
+        if newRoom > currentRoom then
+            isChasing = false
+            print("Psychic: Door opened, stopping the chase.")
+            
+            -- Immediate cleanup
+            if entity.Model then
+                entity.Model:Destroy()
+            end
+            
+            if connection then connection:Disconnect() end
+        end
+    end)
+
+    -- 4. Visuals & Sound (Added to your model)
+    entity:SetCallback("OnSpawned", function()
+        if entity.Model and entity.Model.PrimaryPart then
+            -- Adding a psychic purple aura to your model
+            local p = Instance.new("PointLight", entity.Model.PrimaryPart)
+            p.Color = Color3.fromRGB(150, 0, 255)
+            p.Brightness = 5
+            p.Range = 30
+            
+            -- Sound of whispers
+            local s = Instance.new("Sound", entity.Model.PrimaryPart)
+            s.SoundId = "rbxassetid://9114441544"
+            s.Volume = 2
+            s.Looped = true
+            s:Play()
+        end
+    end)
+end
+    end
+end)()
+
